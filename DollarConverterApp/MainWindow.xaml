@@ -6,7 +6,7 @@
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:DollarConverterApp"
         mc:Ignorable="d"
-        Title="Glass Converter" Height="580" Width="400"
+        Title="Glass Converter" Height="680" Width="420"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" 
         AllowsTransparency="True"
@@ -14,107 +14,244 @@
         ResizeMode="CanMinimize">
 
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <local:LoadingOpacityConverter x:Key="LoadingOpacityConverter"/>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+
+        <!-- Color Palette -->
+        <SolidColorBrush x:Key="AccentColor" Color="#00E5FF"/>
+        <SolidColorBrush x:Key="SecondaryAccent" Color="#D500F9"/>
+        <SolidColorBrush x:Key="GlassBackground" Color="#15FFFFFF"/>
+        <SolidColorBrush x:Key="GlassBorder" Color="#30FFFFFF"/>
+
+        <!-- Typography -->
         <Style x:Key="LabelText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#CCFFFFFF"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Foreground" Value="#80FFFFFF"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="CharacterSpacing" Value="50"/>
         </Style>
 
+        <!-- Glass Input Style -->
         <Style x:Key="GlassInput" TargetType="TextBox">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="36"/>
+            <Setter Property="FontSize" Value="32"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="CaretBrush" Value="{StaticResource AccentColor}"/>
             <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="SelectionBrush" Value="{StaticResource AccentColor}"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <!-- Subtle glow effect could be added here if needed -->
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Elegant Glass Button Style -->
+        <Style x:Key="ElegantButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource GlassBackground}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{StaticResource GlassBorder}" 
+                                BorderThickness="1" 
+                                CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#25FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#10FFFFFF"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Circular IconButton Style -->
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="20" Background="Transparent" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#15FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
-    <Border CornerRadius="20" BorderBrush="#30FFFFFF" BorderThickness="1">
+    <!-- Main Window Container -->
+    <Border CornerRadius="32" BorderBrush="#40FFFFFF" BorderThickness="1.5">
         <Border.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#1A1F35" Offset="0.0"/>
-                <GradientStop Color="#281C38" Offset="1.0"/>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1.1,1.1">
+                <GradientStop Color="#0F101A" Offset="0"/>
+                <GradientStop Color="#1A0F25" Offset="0.5"/>
+                <GradientStop Color="#0F1A25" Offset="1"/>
             </LinearGradientBrush>
         </Border.Background>
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="40" ShadowDepth="0" Color="Black" Opacity="0.8"/>
+        </Border.Effect>
         
-        <Grid Margin="25">
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/> <RowDefinition Height="Auto"/> <RowDefinition Height="Auto"/> <RowDefinition Height="Auto"/> <RowDefinition Height="Auto"/> <RowDefinition Height="*"/>    <RowDefinition Height="Auto"/> </Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Header -->
+                <RowDefinition Height="*"/>    <!-- Content -->
+                <RowDefinition Height="Auto"/> <!-- Navigation/Bottom Bar -->
+            </Grid.RowDefinitions>
 
-            <Button Grid.Row="0" Command="{Binding CloseCommand}" 
-                    HorizontalAlignment="Right" Content="✕" 
-                    Foreground="White" Background="Transparent" BorderThickness="0"
-                    FontSize="16" Cursor="Hand" Width="30" Height="30"/>
-
-            <StackPanel Grid.Row="1" Margin="0,0,0,30">
-                <TextBlock Text="Glass Dolar" FontSize="28" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                
-                <Viewbox Height="25" Margin="0,5,0,0">
-                    <DatePicker SelectedDate="{Binding SelectedDate}" 
-                                DisplayDateEnd="{Binding Mode=OneWay, Source={x:Static system:DateTime.Today}}"
-                                Background="Transparent" BorderThickness="0" Foreground="White">
-                        <DatePicker.Resources>
-                            <Style TargetType="DatePickerTextBox">
-                                <Setter Property="IsReadOnly" Value="True"/>
-                                <Setter Property="Foreground" Value="#00C2FF"/>
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="BorderThickness" Value="0"/>
-                            </Style>
-                        </DatePicker.Resources>
-                    </DatePicker>
-                </Viewbox>
-            </StackPanel>
-
-            <Border Grid.Row="2" CornerRadius="15" Padding="20" Background="#15FFFFFF" BorderBrush="#30FFFFFF" BorderThickness="1">
-                <StackPanel>
-                    <TextBlock Text="🇺🇸 DÓLAR (USD)" Style="{StaticResource LabelText}"/>
-                    <TextBox Text="{Binding UsdText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource GlassInput}"/>
+            <!-- Custom Header Area -->
+            <Grid Grid.Row="0" Margin="30,25,30,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="12" Height="12" CornerRadius="6" Background="{StaticResource AccentColor}" Margin="0,0,10,0">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10" Color="{Binding Color, Source={StaticResource AccentColor}}" ShadowDepth="0"/>
+                        </Border.Effect>
+                    </Border>
+                    <TextBlock Text="GLASS CONVERTER" Foreground="White" FontSize="11" FontWeight="Bold" CharacterSpacing="200" VerticalAlignment="Center" Opacity="0.8"/>
                 </StackPanel>
-            </Border>
 
-            <Grid Grid.Row="3" Margin="0,-15,0,-15" Panel.ZIndex="10">
-                <Border Width="40" Height="40" CornerRadius="20" Background="#00C2FF">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="10" Color="#00C2FF" ShadowDepth="0" Opacity="0.6"/>
-                    </Border.Effect>
-                    <TextBlock Text="⇅" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Margin="0,-2,0,0"/>
-                </Border>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource IconButton}" Content="—" Foreground="White" Width="30" Height="30" Click="OnMinimizeClick"/>
+                    <Button Style="{StaticResource IconButton}" Command="{Binding CloseCommand}" Content="✕" Foreground="White" Width="30" Height="30" Margin="5,0,0,0"/>
+                </StackPanel>
             </Grid>
 
-            <Border Grid.Row="4" CornerRadius="15" Padding="20" Background="#15FFFFFF" BorderBrush="#30FFFFFF" BorderThickness="1">
-                <StackPanel>
-                    <TextBlock Text="🇧🇷 REAL (BRL)" Style="{StaticResource LabelText}"/>
-                    <TextBox Text="{Binding BrlText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource GlassInput}"/>
-                </StackPanel>
-            </Border>
+            <!-- Main Content Area -->
+            <Grid Grid.Row="1" Margin="35,10,35,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Title / Subtitle -->
+                    <RowDefinition Height="*"/>    <!-- Main Components -->
+                </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="6" VerticalAlignment="Bottom">
-                <Border Background="#10FFFFFF" CornerRadius="10" Padding="15">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel>
-                            <TextBlock Text="{Binding StatusMessage}" Foreground="#00C2FF" FontWeight="Bold"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                <TextBlock Text="1 USD = " Foreground="#80FFFFFF" FontSize="12"/>
-                                <TextBlock Text="{Binding CurrentRate, StringFormat=C2, ConverterCulture=pt-BR}" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </StackPanel>
-
-                        <Button Grid.Column="1" Command="{Binding RefreshCommand}" Content="⟳" 
-                                Background="Transparent" Foreground="White" FontSize="24" BorderThickness="0"
-                                VerticalAlignment="Center" Cursor="Hand"/>
+                <StackPanel Grid.Row="0" Margin="0,20,0,40">
+                    <TextBlock Text="Câmbio Agora" FontSize="36" FontWeight="Bold" Foreground="White"/>
+                    
+                    <Grid Height="35" Margin="0,15,0,0" HorizontalAlignment="Left">
+                        <Border CornerRadius="12" Background="{StaticResource GlassBackground}" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1" Padding="15,0">
+                            <DatePicker SelectedDate="{Binding SelectedDate}" 
+                                        DisplayDateEnd="{Binding Mode=OneWay, Source={x:Static system:DateTime.Today}}"
+                                        Background="Transparent" BorderThickness="0" Foreground="White" VerticalAlignment="Center">
+                                <DatePicker.Resources>
+                                    <Style TargetType="DatePickerTextBox">
+                                        <Setter Property="IsReadOnly" Value="True"/>
+                                        <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                    </Style>
+                                </DatePicker.Resources>
+                            </DatePicker>
+                        </Border>
+                        <ProgressBar IsIndeterminate="True" Height="2" VerticalAlignment="Bottom" Margin="10,0,10,2"
+                                     Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                     Foreground="{StaticResource AccentColor}" Background="Transparent" BorderThickness="0"/>
                     </Grid>
-                </Border>
-                
-                <TextBlock Text="{Binding LastUpdated, StringFormat='Atualizado às {0}'}" 
-                           HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="#40FFFFFF" FontSize="10"/>
-            </StackPanel>
+                </StackPanel>
+
+                <!-- Inputs Grid -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Top">
+                    <!-- USD Card -->
+                    <Border CornerRadius="24" Padding="25" Background="{StaticResource GlassBackground}" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1.5"
+                            Opacity="{Binding IsLoading, Converter={StaticResource LoadingOpacityConverter}}">
+                        <StackPanel>
+                            <Grid>
+                                <TextBlock Text="UNITED STATES" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="USD" Foreground="#40FFFFFF" HorizontalAlignment="Right" FontSize="20" FontWeight="Bold"/>
+                            </Grid>
+                            <TextBox Text="{Binding UsdText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource GlassInput}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Swap Icon -->
+                    <Grid Margin="0,-22,0,-22" Panel.ZIndex="10">
+                        <Border Width="44" Height="44" CornerRadius="22" Background="#111111" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1">
+                            <Grid>
+                                <Border x:Name="SwapGlow" CornerRadius="22" Opacity="0.5">
+                                    <Border.Background>
+                                        <RadialGradientBrush>
+                                            <GradientStop Color="{Binding Color, Source={StaticResource AccentColor}}" Offset="0"/>
+                                            <GradientStop Color="Transparent" Offset="1"/>
+                                        </RadialGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <TextBlock Text="⇅" Foreground="{StaticResource AccentColor}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontWeight="Bold" Margin="0,-2,0,0"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <!-- BRL Card -->
+                    <Border CornerRadius="24" Padding="25" Background="{StaticResource GlassBackground}" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1.5"
+                            Opacity="{Binding IsLoading, Converter={StaticResource LoadingOpacityConverter}}">
+                        <StackPanel>
+                            <Grid>
+                                <TextBlock Text="BRAZIL" Style="{StaticResource LabelText}"/>
+                                <TextBlock Text="BRL" Foreground="#40FFFFFF" HorizontalAlignment="Right" FontSize="20" FontWeight="Bold"/>
+                            </Grid>
+                            <TextBox Text="{Binding BrlText, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource GlassInput}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Quick Info -->
+                    <Border Margin="0,30,0,0" CornerRadius="18" Padding="20" Background="#08FFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource AccentColor}" FontWeight="Bold" FontSize="13"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                    <TextBlock Text="Cotação atual: " Foreground="#60FFFFFF" FontSize="12"/>
+                                    <TextBlock Text="{Binding CurrentRate, StringFormat=C4, ConverterCulture=pt-BR}" Foreground="White" FontSize="12" FontWeight="Bold"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <Button HorizontalAlignment="Right" VerticalAlignment="Center" 
+                                    Style="{StaticResource IconButton}" Command="{Binding RefreshCommand}"
+                                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBooleanConverter}}">
+                                <TextBlock Text="⟳" Foreground="White" FontSize="28" Margin="0,-4,0,0"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- Bottom Menu Bar -->
+            <Border Grid.Row="2" Margin="35,20,35,30" CornerRadius="20" Background="#1AFFFFFF" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1" Padding="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Button Grid.Column="0" Style="{StaticResource IconButton}" Content="🏠" Foreground="White" FontSize="20"/>
+                    <Button Grid.Column="1" Style="{StaticResource IconButton}" Content="📊" Foreground="{StaticResource AccentColor}" FontSize="20"/>
+                    <Button Grid.Column="2" Style="{StaticResource IconButton}" Content="⚙️" Foreground="White" FontSize="20"/>
+                </Grid>
+            </Border>
 
         </Grid>
     </Border>

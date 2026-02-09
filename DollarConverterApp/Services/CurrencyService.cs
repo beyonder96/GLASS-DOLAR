@@ -9,8 +9,8 @@ namespace DollarConverterApp.Services
 {
     public class CurrencyService
     {
-        private const string RealTimeApiUrl = "https://awesomeapi.com.br/last/USD-BRL";
-        private const string BcbBaseUrl = "https://api.bcb.gov.br/dados/serie/1/dados";
+        private const string RealTimeApiUrl = "https://economia.awesomeapi.com.br/json/last/USD-BRL?token=f1e16045a1e63a5250ee861dc0ae0fe647b21a20b9128b85453c7ca4e8a1d24c";
+        private const string BcbBaseUrl = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados";
         
         private readonly HttpClient _httpClient;
 

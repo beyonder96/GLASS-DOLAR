@@ -82,14 +82,19 @@ namespace DollarConverterApp.ViewModels
                 {
                     rate = await _currencyService.GetRealTimeRateAsync();
                     if (rate.HasValue) 
-                        StatusMessage = "Mercado (Ao Vivo)";
+                        StatusMessage = "MERCADO AO VIVO";
                     else 
-                        StatusMessage = "Erro API (Tentando Fallback)";
+                        StatusMessage = "ERRO NA API";
                 }
                 else
                 {
-                    StatusMessage = $"Histórico ({SelectedDate:dd/MM})...";
+                    StatusMessage = $"BUSCANDO {SelectedDate:dd/MM}";
                     rate = await _currencyService.GetHistoricalRateAsync(SelectedDate);
+                    
+                    if (rate.HasValue)
+                    {
+                        StatusMessage = "COTACAO HISTORICA";
+                    }
                 }
 
                 if (rate.HasValue)
@@ -147,7 +152,8 @@ namespace DollarConverterApp.ViewModels
         private void CalculateFromUsd()
         {
             if (CurrentRate <= 0) return;
-            if (decimal.TryParse(UsdText.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal usdVal))
+            string cleanInput = UsdText.Replace(",", ".");
+            if (decimal.TryParse(cleanInput, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal usdVal))
             {
                 _isCalculating = true;
                 BrlText = (usdVal * CurrentRate).ToString("N2", new CultureInfo("pt-BR"));
@@ -158,8 +164,8 @@ namespace DollarConverterApp.ViewModels
         private void CalculateFromBrl()
         {
             if (CurrentRate <= 0) return;
-            string cleanInput = BrlText.Replace(".", ""); 
-            if (decimal.TryParse(cleanInput, NumberStyles.Any, new CultureInfo("pt-BR"), out decimal brlVal))
+            string cleanInput = BrlText.Replace(".", "").Replace(",", ".");
+            if (decimal.TryParse(cleanInput, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal brlVal))
             {
                 _isCalculating = true;
                 UsdText = (brlVal / CurrentRate).ToString("N2", CultureInfo.InvariantCulture);
