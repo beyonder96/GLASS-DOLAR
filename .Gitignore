@@ -1,0 +1,13 @@
+# Ignorar pastas de build do .NET
+bin/
+obj/
+
+# Ignorar configurações de usuário do VS/VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Ignorar arquivos temporários do sistema
+Thumbs.db
+.DS_Store
