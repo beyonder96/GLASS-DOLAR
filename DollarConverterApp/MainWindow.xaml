@@ -5,66 +5,84 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DollarConverterApp"
         mc:Ignorable="d"
-        Title="Conversor de Dólar" Height="450" Width="400"
+        Title="Glass Dolar Converter" Height="500" Width="400"
         WindowStartupLocation="CenterScreen"
         Background="#F5F5F7">
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- Header -->
-        <TextBlock Grid.Row="0" Text="Conversor USD/BRL" 
-                   FontSize="24" FontWeight="Bold" 
-                   HorizontalAlignment="Center" Margin="0,0,0,30"
-                   Foreground="#333333"/>
-
-        <!-- USD Section -->
-        <Border Grid.Row="1" Background="White" CornerRadius="10" Padding="15" Margin="0,0,0,15"
-                Effect="{DynamicResource ShadowEffect}">
-            <StackPanel>
-                <TextBlock Text="USD - Dólar Americano" Foreground="#666666" Margin="0,0,0,5"/>
-                <TextBox Text="{Binding UsdAmount, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" 
-                         FontSize="28" FontWeight="SemiBold" BorderThickness="0"
-                         HorizontalContentAlignment="Right"/>
-            </StackPanel>
-        </Border>
-
-        <!-- Exchange Icon -->
-        <Border Grid.Row="2" Background="#E1E1E1" Width="40" Height="40" CornerRadius="20" 
-                HorizontalAlignment="Center" Margin="0,-10,0,-10" Panel.ZIndex="1">
-            <TextBlock Text="↕" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
-        </Border>
-
-        <!-- BRL Section -->
-        <Border Grid.Row="3" Background="White" CornerRadius="10" Padding="15" Margin="0,15,0,20"
-                Effect="{DynamicResource ShadowEffect}">
-            <StackPanel>
-                <TextBlock Text="BRL - Real Brasileiro" Foreground="#666666" Margin="0,0,0,5"/>
-                <TextBox Text="{Binding BrlAmount, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" 
-                         FontSize="28" FontWeight="SemiBold" BorderThickness="0"
-                         HorizontalContentAlignment="Right"/>
-            </StackPanel>
-        </Border>
-
-        <!-- Info Section -->
-        <StackPanel Grid.Row="4" VerticalAlignment="Bottom">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-                <TextBlock Text="Cotação Atual: " Foreground="#666666"/>
-                <TextBlock Text="{Binding CurrentRate, StringFormat=C2, ConverterCulture=pt-BR}" FontWeight="Bold" Foreground="#333333"/>
-            </StackPanel>
-            
-            <TextBlock Text="{Binding LastUpdated, StringFormat='Atualizado em: {0}'}" 
-                       HorizontalAlignment="Center" Foreground="#999999" FontSize="12"/>
-        </StackPanel>
-
-    </Grid>
-
+    
     <Window.Resources>
-        <DropShadowEffect x:Key="ShadowEffect" BlurRadius="10" ShadowDepth="2" Direction="270" Color="#E0E0E0" Opacity="0.5"/>
+        <DropShadowEffect x:Key="ShadowEffect" BlurRadius="15" ShadowDepth="5" Direction="270" Color="#E0E0E0" Opacity="0.7"/>
+        
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
+
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <RowDefinition Height="Auto"/> <RowDefinition Height="Auto"/> <RowDefinition Height="Auto"/> <RowDefinition Height="*"/>    <RowDefinition Height="Auto"/> </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="USD ↔ BRL" 
+                   FontSize="28" FontWeight="Bold" 
+                   HorizontalAlignment="Center" Margin="0,0,0,30"
+                   Foreground="#2D2D2D"/>
+
+        <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="15" Margin="0,0,0,15"
+                Effect="{DynamicResource ShadowEffect}">
+            <StackPanel>
+                <TextBlock Text="🇺🇸 Dólar Americano (USD)" Foreground="#888888" FontSize="12" Margin="0,0,0,5"/>
+                <TextBox Text="{Binding UsdAmount, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" 
+                         FontSize="32" FontWeight="SemiBold" BorderThickness="0"
+                         HorizontalContentAlignment="Right" Foreground="#333333"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2" Background="#007AFF" Width="44" Height="44" CornerRadius="22" 
+                HorizontalAlignment="Center" Margin="0,-22,0,-22" Panel.ZIndex="10"
+                BorderBrush="White" BorderThickness="3">
+            <TextBlock Text="⇵" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" FontWeight="Bold" Margin="0,-2,0,0"/>
+        </Border>
+
+        <Border Grid.Row="3" Background="White" CornerRadius="12" Padding="15" Margin="0,15,0,20"
+                Effect="{DynamicResource ShadowEffect}">
+            <StackPanel>
+                <TextBlock Text="🇧🇷 Real Brasileiro (BRL)" Foreground="#888888" FontSize="12" Margin="0,0,0,5"/>
+                <TextBox Text="{Binding BrlAmount, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}" 
+                         FontSize="32" FontWeight="SemiBold" BorderThickness="0"
+                         HorizontalContentAlignment="Right" Foreground="#333333"/>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="5" VerticalAlignment="Bottom">
+            
+            <Border Background="#EFEFF4" CornerRadius="8" Padding="10" Margin="0,0,0,15">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <TextBlock Text="Cotação:" Foreground="#666666"/>
+                        <TextBlock Text="{Binding CurrentRate, StringFormat=C2, ConverterCulture=pt-BR}" FontWeight="Bold" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding LastUpdated}" HorizontalAlignment="Right" Foreground="#999999" FontSize="11" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding StatusMessage}" 
+                           Foreground="{Binding IsLoading, Converter={StaticResource BoolToVis}}" 
+                           VerticalAlignment="Center" FontSize="12" TextTrimming="CharacterEllipsis"/>
+
+                <Button Grid.Column="1" Command="{Binding RefreshCommand}" 
+                        Content="Atualizar" Padding="15,8"
+                        Background="#007AFF" Foreground="White" FontWeight="SemiBold"
+                        BorderThickness="0">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="6"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </Grid>
+        </StackPanel>
+    </Grid>
 </Window>

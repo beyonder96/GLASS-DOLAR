@@ -18,3 +18,24 @@ C:\Users\kenne\.gemini\antigravity\playground\final-trifid\DollarConverterApp\ob
 C:\Users\kenne\.gemini\antigravity\playground\final-trifid\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.pdb
 C:\Users\kenne\.gemini\antigravity\playground\final-trifid\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.genruntimeconfig.cache
 C:\Users\kenne\.gemini\antigravity\playground\final-trifid\DollarConverterApp\obj\Debug\net10.0-windows\ref\DollarConverterApp.dll
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\bin\Debug\net10.0-windows\DollarConverterApp.exe
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\bin\Debug\net10.0-windows\DollarConverterApp.deps.json
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\bin\Debug\net10.0-windows\DollarConverterApp.runtimeconfig.json
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\bin\Debug\net10.0-windows\DollarConverterApp.dll
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\bin\Debug\net10.0-windows\DollarConverterApp.pdb
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\MainWindow.g.cs
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\App.g.cs
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp_MarkupCompile.cache
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp_MarkupCompile.lref
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\MainWindow.baml
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.g.resources
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.AssemblyInfoInputs.cache
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.AssemblyInfo.cs
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.csproj.CoreCompileInputs.cache
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.sourcelink.json
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.dll
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\refint\DollarConverterApp.dll
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.pdb
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\DollarConverterApp.genruntimeconfig.cache
+C:\Users\kenne\OneDrive\Documentos\Projetos\GLASS DOLAR\DollarConverterApp\obj\Debug\net10.0-windows\ref\DollarConverterApp.dll

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using System.Windows.Threading;
 using DollarConverterApp.Models;
 using DollarConverterApp.Services;
@@ -15,19 +16,30 @@ namespace DollarConverterApp.ViewModels
         private decimal _brlAmount;
         private decimal _currentRate;
         private string _lastUpdated;
+        private string _statusMessage; // Nova propriedade para feedback
         private bool _isLoading;
+        
+        // Flags para evitar loop infinito de atualização cruzada
         private bool _isUpdatingFromUsd;
         private bool _isUpdatingFromBrl;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        // Comando para o botão de atualizar
+        public ICommand RefreshCommand { get; }
+
         public MainViewModel()
         {
             _currencyService = new CurrencyService();
-            _usdAmount = 1.00m; // Default start
+            _usdAmount = 1.00m; 
+            _statusMessage = "Pronto";
+
+            // Inicializa o comando
+            RefreshCommand = new RelayCommand(async _ => await LoadRateAsync());
             
             InitializeTimer();
-            LoadRateAsync();
+            // Dispara a carga inicial
+            _ = LoadRateAsync(); 
         }
 
         private void InitializeTimer()
@@ -39,19 +51,59 @@ namespace DollarConverterApp.ViewModels
         }
 
         private async Task LoadRateAsync()
-        {
-            IsLoading = true;
-            var rate = await _currencyService.GetCurrentRateAsync();
-            IsLoading = false;
+{
+    if (IsLoading) return;
 
-            if (rate != null && decimal.TryParse(rate.Bid, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal bidValue))
+    try 
+    {
+        IsLoading = true;
+        StatusMessage = "Buscando cotação comercial...";
+        
+        // 1. Tenta API Comercial (Rápida e Recente)
+        var rate = await _currencyService.GetCurrentRateAsync();
+
+        if (rate != null && decimal.TryParse(rate.Bid, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out decimal bidValue))
+        {
+            CurrentRate = bidValue;
+            LastUpdated = DateTime.Now.ToString("HH:mm:ss");
+            StatusMessage = $"Mercado: R$ {CurrentRate:N2}"; // Feedback visual da fonte
+            RecalculateFromUsd();
+        }
+        else
+        {
+            // 2. FALLBACK: Se falhar, tenta Banco Central
+            StatusMessage = "Falha no mercado. Tentando BCB...";
+            var bcbRate = await _currencyService.GetOfficialBcbRateAsync();
+
+            if (bcbRate.HasValue)
             {
-                CurrentRate = bidValue;
-                LastUpdated = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                
-                // Refresh conversion
+                CurrentRate = bcbRate.Value;
+                LastUpdated = "PTAX (Oficial)";
+                StatusMessage = $"Fonte Oficial (BCB): R$ {CurrentRate:N4}";
                 RecalculateFromUsd();
             }
+            else
+            {
+                StatusMessage = "Sem conexão com APIs.";
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        StatusMessage = $"Erro crítico: {ex.Message}";
+    }
+    finally
+    {
+        IsLoading = false;
+    }
+}
+
+        // --- Propriedades ---
+
+        public string StatusMessage
+        {
+            get => _statusMessage;
+            set { _statusMessage = value; OnPropertyChanged(); }
         }
 
         public decimal UsdAmount
@@ -63,10 +115,7 @@ namespace DollarConverterApp.ViewModels
                 {
                     _usdAmount = value;
                     OnPropertyChanged();
-                    if (!_isUpdatingFromBrl)
-                    {
-                        RecalculateFromUsd();
-                    }
+                    if (!_isUpdatingFromBrl) RecalculateFromUsd();
                 }
             }
         }
@@ -80,10 +129,7 @@ namespace DollarConverterApp.ViewModels
                 {
                     _brlAmount = value;
                     OnPropertyChanged();
-                    if (!_isUpdatingFromUsd)
-                    {
-                        RecalculateFromBrl();
-                    }
+                    if (!_isUpdatingFromUsd) RecalculateFromBrl();
                 }
             }
         }
@@ -91,46 +137,26 @@ namespace DollarConverterApp.ViewModels
         public decimal CurrentRate
         {
             get => _currentRate;
-            set
-            {
-                if (_currentRate != value)
-                {
-                    _currentRate = value;
-                    OnPropertyChanged();
-                }
-            }
+            set { _currentRate = value; OnPropertyChanged(); }
         }
 
         public string LastUpdated
         {
             get => _lastUpdated;
-            set
-            {
-                if (_lastUpdated != value)
-                {
-                    _lastUpdated = value;
-                    OnPropertyChanged();
-                }
-            }
+            set { _lastUpdated = value; OnPropertyChanged(); }
         }
 
         public bool IsLoading
         {
             get => _isLoading;
-            set
-            {
-                if (_isLoading != value)
-                {
-                    _isLoading = value;
-                    OnPropertyChanged();
-                }
-            }
+            set { _isLoading = value; OnPropertyChanged(); }
         }
+
+        // --- Lógica de Conversão ---
 
         private void RecalculateFromUsd()
         {
             if (CurrentRate <= 0) return;
-            
             _isUpdatingFromUsd = true;
             BrlAmount = Math.Round(UsdAmount * CurrentRate, 2);
             _isUpdatingFromUsd = false;
@@ -139,7 +165,6 @@ namespace DollarConverterApp.ViewModels
         private void RecalculateFromBrl()
         {
             if (CurrentRate <= 0) return;
-
             _isUpdatingFromBrl = true;
             UsdAmount = Math.Round(BrlAmount / CurrentRate, 2);
             _isUpdatingFromBrl = false;
@@ -148,6 +173,27 @@ namespace DollarConverterApp.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+    }
+
+    // Mini-implementação de ICommand para não precisarmos de libs externas agora
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Predicate<object> _canExecute;
+
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+        public void Execute(object parameter) => _execute(parameter);
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
         }
     }
 }

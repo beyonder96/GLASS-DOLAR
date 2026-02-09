@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kenne\\.gemini\\antigravity\\playground\\final-trifid\\DollarConverterApp\\DollarConverterApp.csproj": {}
+    "C:\\Users\\kenne\\OneDrive\\Documentos\\Projetos\\GLASS DOLAR\\DollarConverterApp\\DollarConverterApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kenne\\.gemini\\antigravity\\playground\\final-trifid\\DollarConverterApp\\DollarConverterApp.csproj": {
+    "C:\\Users\\kenne\\OneDrive\\Documentos\\Projetos\\GLASS DOLAR\\DollarConverterApp\\DollarConverterApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kenne\\.gemini\\antigravity\\playground\\final-trifid\\DollarConverterApp\\DollarConverterApp.csproj",
+        "projectUniqueName": "C:\\Users\\kenne\\OneDrive\\Documentos\\Projetos\\GLASS DOLAR\\DollarConverterApp\\DollarConverterApp.csproj",
         "projectName": "DollarConverterApp",
-        "projectPath": "C:\\Users\\kenne\\.gemini\\antigravity\\playground\\final-trifid\\DollarConverterApp\\DollarConverterApp.csproj",
+        "projectPath": "C:\\Users\\kenne\\OneDrive\\Documentos\\Projetos\\GLASS DOLAR\\DollarConverterApp\\DollarConverterApp.csproj",
         "packagesPath": "C:\\Users\\kenne\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kenne\\.gemini\\antigravity\\playground\\final-trifid\\DollarConverterApp\\obj\\",
+        "outputPath": "C:\\Users\\kenne\\OneDrive\\Documentos\\Projetos\\GLASS DOLAR\\DollarConverterApp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\kenne\\AppData\\Roaming\\NuGet\\NuGet.Config"
