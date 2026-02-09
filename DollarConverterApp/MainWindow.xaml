@@ -3,9 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:DollarConverterApp"
         mc:Ignorable="d"
-        Title="Glass Converter" Height="550" Width="400"
+        Title="Glass Converter" Height="580" Width="400"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" 
         AllowsTransparency="True"
@@ -49,7 +50,21 @@
 
             <StackPanel Grid.Row="1" Margin="0,0,0,30">
                 <TextBlock Text="Glass Dolar" FontSize="28" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                <TextBlock Text="Cotação em Tempo Real" FontSize="14" Foreground="#80FFFFFF" HorizontalAlignment="Center"/>
+                
+                <Viewbox Height="25" Margin="0,5,0,0">
+                    <DatePicker SelectedDate="{Binding SelectedDate}" 
+                                DisplayDateEnd="{Binding Mode=OneWay, Source={x:Static system:DateTime.Today}}"
+                                Background="Transparent" BorderThickness="0" Foreground="White">
+                        <DatePicker.Resources>
+                            <Style TargetType="DatePickerTextBox">
+                                <Setter Property="IsReadOnly" Value="True"/>
+                                <Setter Property="Foreground" Value="#00C2FF"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                            </Style>
+                        </DatePicker.Resources>
+                    </DatePicker>
+                </Viewbox>
             </StackPanel>
 
             <Border Grid.Row="2" CornerRadius="15" Padding="20" Background="#15FFFFFF" BorderBrush="#30FFFFFF" BorderThickness="1">

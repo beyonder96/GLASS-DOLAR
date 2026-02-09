@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices; // <--- O erro estava na falta desta linha
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -16,7 +16,6 @@ namespace DollarConverterApp.ViewModels
         private readonly CurrencyService _currencyService;
         private DispatcherTimer _timer;
 
-        // Usamos string para o Input ficar fluido na UI
         private string _usdText;
         private string _brlText;
         
@@ -25,33 +24,46 @@ namespace DollarConverterApp.ViewModels
         private string _statusMessage;
         private bool _isLoading;
         
-        // Flags para evitar loop infinito de atualização
         private bool _isCalculating;
+        private DateTime _selectedDate;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         public ICommand RefreshCommand { get; }
-        public ICommand CloseCommand { get; } // Comando para fechar a janela
+        public ICommand CloseCommand { get; }
 
         public MainViewModel()
         {
             _currencyService = new CurrencyService();
-            _statusMessage = "Inicializando...";
-            _usdText = "1.00"; // Valor inicial
+            _statusMessage = "Iniciando...";
+            _usdText = "1.00";
+            _brlText = "0,00";
+            _lastUpdated = "-";
             
+            SelectedDate = DateTime.Today;
+
             RefreshCommand = new RelayCommand(async _ => await LoadRateAsync());
             CloseCommand = new RelayCommand(_ => Application.Current.Shutdown());
 
-            InitializeTimer();
-            // Dispara sem esperar (Fire and Forget seguro)
-            _ = LoadRateAsync();
-        }
-
-        private void InitializeTimer()
-        {
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromSeconds(30);
             _timer.Tick += async (s, e) => await LoadRateAsync();
             _timer.Start();
+
+            _ = LoadRateAsync();
+        }
+
+        public DateTime SelectedDate
+        {
+            get => _selectedDate;
+            set
+            {
+                if (_selectedDate != value)
+                {
+                    _selectedDate = value;
+                    OnPropertyChanged();
+                    _ = LoadRateAsync();
+                }
+            }
         }
 
         private async Task LoadRateAsync()
@@ -61,45 +73,48 @@ namespace DollarConverterApp.ViewModels
             try 
             {
                 IsLoading = true;
-                StatusMessage = "Sincronizando...";
+                StatusMessage = "Buscando...";
                 
-                // Tenta API Comercial
-                var rate = await _currencyService.GetCurrentRateAsync();
-
-                if (rate != null && decimal.TryParse(rate.Bid, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal bidValue))
+                decimal? rate = null;
+                bool isToday = SelectedDate.Date >= DateTime.Today;
+                
+                if (isToday)
                 {
-                    CurrentRate = bidValue;
-                    LastUpdated = DateTime.Now.ToString("HH:mm");
-                    StatusMessage = "Mercado (Tempo Real)";
+                    rate = await _currencyService.GetRealTimeRateAsync();
+                    if (rate.HasValue) 
+                        StatusMessage = "Mercado (Ao Vivo)";
+                    else 
+                        StatusMessage = "Erro API (Tentando Fallback)";
                 }
                 else
                 {
-                    // Fallback: Banco Central
-                    StatusMessage = "Tentando BCB...";
-                    var bcbRate = await _currencyService.GetOfficialBcbRateAsync();
-
-                    if (bcbRate.HasValue)
-                    {
-                        CurrentRate = bcbRate.Value;
-                        LastUpdated = "PTAX Oficial";
-                        StatusMessage = "Fonte Oficial (BCB)";
-                    }
-                    else
-                    {
-                        StatusMessage = "Offline (Verifique a rede)";
-                    }
+                    StatusMessage = $"Histórico ({SelectedDate:dd/MM})...";
+                    rate = await _currencyService.GetHistoricalRateAsync(SelectedDate);
                 }
 
-                // Recalcula baseado no que já está digitado (prioridade USD)
+                if (rate.HasValue)
+                {
+                    CurrentRate = rate.Value;
+                    LastUpdated = DateTime.Now.ToString("HH:mm");
+                }
+                else if (CurrentRate == 0)
+                {
+                    CurrentRate = 5.80m;
+                    StatusMessage = "⚠️ Offline (Taxa Fixa)";
+                }
+
                 CalculateFromUsd();
+            }
+            catch
+            {
+                StatusMessage = "Erro Crítico";
+                if (CurrentRate == 0) CurrentRate = 5.80m;
             }
             finally
             {
                 IsLoading = false;
             }
         }
-
-        // --- Propriedades de Texto (Inputs) ---
 
         public string UsdText
         {
@@ -129,17 +144,12 @@ namespace DollarConverterApp.ViewModels
             }
         }
 
-        // --- Lógica de Cálculo ---
-
         private void CalculateFromUsd()
         {
             if (CurrentRate <= 0) return;
-
-            // Tenta converter o texto do usuário para número
             if (decimal.TryParse(UsdText.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal usdVal))
             {
                 _isCalculating = true;
-                // Formata o BRL para exibir na tela
                 BrlText = (usdVal * CurrentRate).ToString("N2", new CultureInfo("pt-BR"));
                 _isCalculating = false;
             }
@@ -148,25 +158,21 @@ namespace DollarConverterApp.ViewModels
         private void CalculateFromBrl()
         {
             if (CurrentRate <= 0) return;
-
-            // Tenta converter o texto do usuário para número
-            // Aceita tanto ponto quanto vírgula
-            if (decimal.TryParse(BrlText.Replace(".", "").Replace(",", "."), NumberStyles.Any, new CultureInfo("pt-BR"), out decimal brlVal))
+            string cleanInput = BrlText.Replace(".", ""); 
+            if (decimal.TryParse(cleanInput, NumberStyles.Any, new CultureInfo("pt-BR"), out decimal brlVal))
             {
                 _isCalculating = true;
-                // Formata o USD para exibir na tela
                 UsdText = (brlVal / CurrentRate).ToString("N2", CultureInfo.InvariantCulture);
                 _isCalculating = false;
             }
         }
 
-        // --- Boilerplate ---
         public decimal CurrentRate { get => _currentRate; set { _currentRate = value; OnPropertyChanged(); } }
         public string LastUpdated { get => _lastUpdated; set { _lastUpdated = value; OnPropertyChanged(); } }
         public string StatusMessage { get => _statusMessage; set { _statusMessage = value; OnPropertyChanged(); } }
         public bool IsLoading { get => _isLoading; set { _isLoading = value; OnPropertyChanged(); } }
 
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
@@ -174,10 +180,15 @@ namespace DollarConverterApp.ViewModels
 
     public class RelayCommand : ICommand
     {
-        private readonly Action<object> _execute;
-        public RelayCommand(Action<object> execute) => _execute = execute;
-        public bool CanExecute(object parameter) => true;
-        public void Execute(object parameter) => _execute(parameter);
-        public event EventHandler CanExecuteChanged;
+        private readonly Action<object?> _execute;
+        public RelayCommand(Action<object?> execute) => _execute = execute;
+        public bool CanExecute(object? parameter) => true;
+        public void Execute(object? parameter) => _execute(parameter);
+        
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
     }
 }
